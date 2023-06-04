@@ -1,0 +1,327 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API",
+        "version": "1.0.0",
+        "description": "REST API for users"
+    },
+    "components": {
+        "schemas": {
+            "TokenResponse": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string"
+                    }
+                }
+            },
+            "UsersResponse": {
+                "type": "object",
+                "properties": {
+                    "users": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "_id": {
+                                    "type": "string",
+                                    "format": "ObjectId"
+                                },
+                                "name": {
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "type": "string"
+                                },
+                                "password": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/users/register": {
+            "post": {
+                "summary": "Register a new user.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "default": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "default": "example@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "default": "postman"
+                                    }
+                                },
+                                "required": ["name", "email", "password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User successfully created.",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    },
+                    "400": {
+                        "description": "Input validation errors or the entered email address is already registered in the database.",
+                        "x-error-description": {
+                            "validation": "Validation error",
+                            "duplicate-email": "Existing email"
+                        }
+                    },
+                    "500": {
+                        "description": "Server error.",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/login": {
+            "post": {
+                "summary": "Login user.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "default": "johndoe@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "default": "postman"
+                                    }
+                                },
+                                "required": ["email", "password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "JWT token for validated user.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Input validation errors, email does not exist in the database or incorrect user password.",
+                        "x-error-description": {
+                            "validation": "Validation error.",
+                            "not-exists-email-db": "email does not exist in the database.",
+                            "incorrect-password": "Incorrect password."
+                        }
+                    },
+                    "500": {
+                        "description": "Server error.",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/private/": {
+            "get": {
+                "summary": "Get all users.",
+                "parameters": [
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "description": "Content type",
+                        "required": true,
+                        "default": "application/json",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "auth-token",
+                        "in": "header",
+                        "description": "Auth token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of all users.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsersResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "summary": "Update the name of a user.",
+                "parameters": [
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "description": "Content type",
+                        "required": true,
+                        "default": "application/json",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "auth-token",
+                        "in": "header",
+                        "description": "Auth token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "default": "John Doe Updated"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "default": "johndoe@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "default": "postman"
+                                    }
+                                },
+                                "required": ["name", "email", "password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User successfully updated.",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    },
+                    "400": {
+                        "description": "Input validation errors, email does not exist in the database or incorrect password.",
+                        "x-error-description": {
+                            "validation": "Validation error.",
+                            "not-exists-email-db": "Email does not exist in the database.",
+                            "incorrect-password": "Incorrect password."
+                        }
+                    },
+                    "500": {
+                        "description": "Server error.",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete a user.",
+                "parameters": [
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "description": "Content type",
+                        "required": true,
+                        "default": "application/json",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "auth-token",
+                        "in": "header",
+                        "description": "Auth token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "default": "johndoe@gmail.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "default": "postman"
+                                    }
+                                },
+                                "required": ["email", "password"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User successfully deleted.",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    },
+                    "400": {
+                        "description": "Input validation errors, email does not exist in the database or incorrect password.",
+                        "x-error-description": {
+                            "validation": "Validation error.",
+                            "not-exists-email-db": "Email does not exist in the database.",
+                            "incorrect-password": "Incorrect password."
+                        }
+                    },
+                    "500": {
+                        "description": "Server error.",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
