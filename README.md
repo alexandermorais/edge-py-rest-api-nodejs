@@ -90,4 +90,4 @@ To delete a user.
 ```http://localhost:3000/api-docs/```
 
 ### Postman collection
-The collection file is located in the "Postman collection" folder.
+The collection file is located in the "Postman collection" folder. In this collection are some sample automated tests for all endpoints.
